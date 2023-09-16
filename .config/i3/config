@@ -13,6 +13,21 @@ include ~/.config/i3/modes/system
 
 set $mod Mod1
 
+# primary
+set $colorp #d4be98
+# secondary
+set $colors #ffffff
+# foreground
+set $colorf #3c3836
+# alt foreground
+set $colorb #282828
+# highlighted foreground
+set $colorw #d4be98
+# urgent
+set $coloru #ea6962
+# bar background
+set $bar_bg #00000000
+
 # Font for window titles. Will also be used by the bar unless a different font
 # is used in the bar {} block below.
 font pango:JetBrainsMono Nerd Font 12
@@ -187,12 +202,6 @@ mode "resize" {
 
 bindsym $mod+r mode "resize"
 
-# Start i3bar to display a workspace bar (plus the system information i3status
-# finds out, if available)
-bar {
-        status_command i3status
-}
-
 # Make the currently focused window a scratchpad
 bindsym $mod+Shift+minus move scratchpad
 
@@ -211,3 +220,49 @@ exec nitrogen --restore
 
 #exec --no-startup-id picom --experimental-backends >/dev/null 2>&1
 
+# Start i3bar to display a workspace bar (plus the system information i3status
+# finds out, if available)
+bar {
+	id "bar-0"
+
+	position top
+	binding_mode_indicator no
+	i3bar_command i3bar --transparency
+	status_command i3blocks -c ~/.config/i3blocks/top
+	tray_padding 3
+
+	colors {
+		background $bar_bg
+		statusline $colorw
+		separator  $colorw85
+
+		# <colorclass>     <border>  <background> <text>
+		focused_workspace  $bar_bg   $colorw    $colorb
+		active_workspace   $bar_bg   $colorw    $colorw
+		inactive_workspace $bar_bg   $bar_bg    $colorw
+		urgent_workspace   $bar_bg   $bar_bg    $coloru
+	}
+}
+bar {
+	id "bar-1"
+
+	position bottom
+	tray_output none
+	workspace_buttons no
+	separator_symbol " "
+	i3bar_command i3bar --transparency
+	status_command i3blocks -c ~/.config/i3blocks/bottom
+	tray_padding 3
+
+	colors {
+		background $bar_bg
+		statusline $colorw
+		separator  $colorw85
+
+		# <colorclass>     <border>  <background> <text>
+		binding_mode       $bar_bg   $bar_bg    $colorw
+		urgent_workspace   $bar_bg   $bar_bg    $coloru
+
+		# urgent_workspace here is for i3blocklets that use exit(33)
+	}
+}
