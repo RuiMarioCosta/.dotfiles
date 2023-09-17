@@ -19,12 +19,17 @@ command=~/.config/scripts/battery
 markup=pango
 interval=30
 
+[volume-pulseaudio]
+command=~/.config/scripts/volume-pulseaudio
+interval=once
+signal=1
+
+# Guess the weather hourly
 [calendar]
 label= 
 command=~/.config/scripts/calendar
 interval=1
 
-# Guess the weather hourly
 [weather]
 command=curl -Ss 'https://wttr.in?0&T&Q' | cut -c 16- | head -2 | xargs echo
 interval=3600
