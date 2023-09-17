@@ -21,7 +21,7 @@ interval=30
 
 [calendar]
 label= 
-command=~/.config/scripts/calendar2
+command=~/.config/scripts/calendar
 interval=1
 
 # Guess the weather hourly
