@@ -141,8 +141,4 @@ source "$OSH"/oh-my-bash.sh
 # alias ohmybash="mate ~/.oh-my-bash"
 
 PATH="$HOME/flutter/bin:$PATH"
-
-alias config='/usr/bin/git --git-dir=/home/rcosta/.dotfiles/ --work-tree=/home/rcosta'
-
-#[ -f "/home/rcosta/.ghcup/env" ] && source "/home/rcosta/.ghcup/env" # ghcup-env
 [ -f "/home/rcosta/.ghcup/env" ] && source "/home/rcosta/.ghcup/env" # ghcup-env

@@ -9,28 +9,11 @@
 #
 # Please see https://i3wm.org/docs/userguide.html for a complete reference!
 
-include ~/.config/i3/modes/system
-
 set $mod Mod1
-
-# primary
-set $colorp #d4be98
-# secondary
-set $colors #ffffff
-# foreground
-set $colorf #3c3836
-# alt foreground
-set $colorb #282828
-# highlighted foreground
-set $colorw #d4be98
-# urgent
-set $coloru #ea6962
-# bar background
-set $bar_bg #00000000
 
 # Font for window titles. Will also be used by the bar unless a different font
 # is used in the bar {} block below.
-font pango:JetBrainsMono Nerd Font 12
+font pango:monospace 8
 
 # This font is widely installed, provides lots of unicode glyphs, right-to-left
 # text rendering and scalability on retina/hidpi displays (thanks to pango).
@@ -52,24 +35,21 @@ exec --no-startup-id xss-lock --transfer-sleep-lock -- i3lock --nofork
 exec --no-startup-id nm-applet
 
 # Use pactl to adjust volume in PulseAudio.
-bindsym XF86AudioMute exec pactl set-sink-mute 0 toggle
-bindsym XF86AudioMute --release exec pkill -RTMIN+1 i3blocks
-bindsym XF86AudioLowerVolume exec pactl set-sink-volume 0 -5%
-bindsym XF86AudioLowerVolume --release exec pkill -RTMIN+1 i3blocks
-bindsym XF86AudioRaiseVolume exec pactl set-sink-volume 0 +5%
-bindsym XF86AudioRaiseVolume --release exec pkill -RTMIN+1 i3blocks
-
-# Media player controls
-bindsym XF86AudioPlay exec playerctl play-pause
-bindsym XF86AudioNext exec playerctl next
-bindsym XF86AudioPrev exec playerctl previous
-
+set $refresh_i3status killall -SIGUSR1 i3status
+bindsym XF86AudioRaiseVolume exec --no-startup-id pactl set-sink-volume @DEFAULT_SINK@ +5% && $refresh_i3status
+bindsym XF86AudioLowerVolume exec --no-startup-id pactl set-sink-volume @DEFAULT_SINK@ -5% && $refresh_i3status
+bindsym XF86AudioMute exec --no-startup-id pactl set-sink-mute @DEFAULT_SINK@ toggle && $refresh_i3status
+bindsym XF86AudioMicMute exec --no-startup-id pactl set-source-mute @DEFAULT_SOURCE@ toggle && $refresh_i3status
 
 # Use Mouse+$mod to drag floating windows to their wanted position
 floating_modifier $mod
 
+# move tiling windows via drag & drop by left-clicking into the title bar,
+# or left-clicking anywhere into the window while holding the floating modifier.
+tiling_drag modifier titlebar
+
 # start a terminal
-bindsym $mod+Return exec kitty
+bindsym $mod+Return exec i3-sensible-terminal
 
 # kill focused window
 bindsym $mod+Shift+q kill
@@ -174,7 +154,27 @@ bindsym $mod+Shift+c reload
 # restart i3 inplace (preserves your layout/session, can be used to upgrade i3)
 bindsym $mod+Shift+r restart
 # exit i3 (logs you out of your X session)
-#bindsym $mod+Shift+e exec "i3-nagbar -t warning -m 'You pressed the exit shortcut. Do you really want to exit i3? This will end your X session.' -B 'Yes, exit i3' 'i3-msg exit'"
+# bindsym $mod+Shift+e exec "i3-nagbar -t warning -m 'You pressed the exit shortcut. Do you really want to exit i3? This will end your X session.' -B 'Yes, exit i3' 'i3-msg exit'"
+
+bindsym Mod4+l exec xscreensaver-command -lock
+
+set $Locker xscreensaver-command -lock && sleep 1
+
+set $mode_system System (l) lock, (e) logout, (s) suspend, (h) hibernate, (r) reboot, (Shift+s) shutdown
+mode "$mode_system" {
+    bindsym l exec --no-startup-id $Locker, mode "default"
+    bindsym e exec --no-startup-id i3-msg exit, mode "default"
+    bindsym s exec --no-startup-id $Locker && systemctl suspend, mode "default"
+    bindsym h exec --no-startup-id $Locker && systemctl hibernate, mode "default"
+    bindsym r exec --no-startup-id systemctl reboot, mode "default"
+    bindsym Shift+s exec --no-startup-id systemctl poweroff -i, mode "default"
+
+    # back to normal: Enter or Escape
+    bindsym Return mode "default"
+    bindsym Escape mode "default"
+}
+
+bindsym $mod+Pause mode "$mode_system"
 
 # resize window (you can also use the mouse for that)
 mode "resize" {
@@ -203,68 +203,14 @@ mode "resize" {
 
 bindsym $mod+r mode "resize"
 
-# Make the currently focused window a scratchpad
-bindsym $mod+Shift+minus move scratchpad
-
-# Show the first scratchpad window
-bindsym $mod+minus scratchpad show
-
-bindsym Mod4+l exec xscreensaver-command -lock
-
-# Set up display monitors at startup
-exec --no-startup-id xrandr --output HDMI-2 --primary --mode 2560x1440 --left-of eDP-1
-
-# Set up backgroup to solid color
-exec --no-startup-id xsetroot -gray
-
 exec nitrogen --restore
 
-exec_always --no-startup-id picom --experimental-backends >/dev/null 2>&1
-#exec --no-startup-id picom --experimental-backends >/dev/null 2>&1
+# Set up display monitors at startup
+exec --no-startup-id xrandr --output HDMI-2 --primary --mode --left-of eDP-1
+
 
 # Start i3bar to display a workspace bar (plus the system information i3status
 # finds out, if available)
 bar {
-	id "bar-0"
-
-	position top
-	binding_mode_indicator no
-	i3bar_command i3bar --transparency
-	status_command i3blocks -c ~/.config/i3blocks/top
-	tray_padding 3
-
-	colors {
-		background $bar_bg
-		statusline $colorw
-		separator  $colorw85
-
-		# <colorclass>     <border>  <background> <text>
-		focused_workspace  $bar_bg   $colorw    $colorb
-		active_workspace   $bar_bg   $colorw    $colorw
-		inactive_workspace $bar_bg   $bar_bg    $colorw
-		urgent_workspace   $bar_bg   $bar_bg    $coloru
-	}
-}
-bar {
-	id "bar-1"
-
-	position bottom
-	tray_output none
-	workspace_buttons no
-	separator_symbol " "
-	i3bar_command i3bar --transparency
-	status_command i3blocks -c ~/.config/i3blocks/bottom
-	tray_padding 3
-
-	colors {
-		background $bar_bg
-		statusline $colorw
-		separator  $colorw85
-
-		# <colorclass>     <border>  <background> <text>
-		binding_mode       $bar_bg   $bar_bg    $colorw
-		urgent_workspace   $bar_bg   $bar_bg    $coloru
-
-		# urgent_workspace here is for i3blocklets that use exit(33)
-	}
+        status_command i3status
 }
