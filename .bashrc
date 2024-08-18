@@ -142,3 +142,4 @@ source "$OSH"/oh-my-bash.sh
 
 PATH="$HOME/flutter/bin:$PATH"
 [ -f "/home/rcosta/.ghcup/env" ] && source "/home/rcosta/.ghcup/env" # ghcup-env
+export PATH="$PATH:/opt/nvim-linux64/bin"
